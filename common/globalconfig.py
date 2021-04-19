@@ -58,7 +58,7 @@ class GlobalConfig:
         self.global_config = Cfg(GLOBAL_CONFIG_FILE)
         self.fairgame_config = self.global_config.get("FAIRGAME")
         self.profile_path = None
-        self.get_browser_profile_path()
+        self.suffix = "def"
 
     def get_amazon_config(self, encryption_pass=None):
         log.info("Initializing Amazon configuration...")
@@ -77,7 +77,7 @@ class GlobalConfig:
             self.profile_path = os.path.join(
                 os.path.dirname(os.path.abspath("__file__")),
                 self.global_config["FAIRGAME"].get("profile_name", ".profile-amz"),
-            )
+            ) + self.suffix
         return self.profile_path
 
     def get_property(self, property_name):

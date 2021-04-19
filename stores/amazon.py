@@ -106,6 +106,7 @@ class Amazon:
         slow_mode=False,
         no_image=False,
         encryption_pass=None,
+		config_path=None,
         log_stock_check=False,
         shipping_bypass=False,
         alt_offers=False,
@@ -169,8 +170,27 @@ class Amazon:
                 os.makedirs("html_saves")
             except:
                 raise
-
-        if os.path.exists(AUTOBUY_CONFIG_PATH):
+		
+        if config_path is not None:
+            config = json.loads(config_path.replace("'", '"'))
+            self.asin_groups = int(config["asin_groups"])
+            self.amazon_website = config.get(
+                "amazon_website", "smile.amazon.com"
+            )
+            for x in range(self.asin_groups):
+                if float(config[f"reserve_min_{x + 1}"]) > float(
+                    config[f"reserve_max_{x + 1}"]
+                ):
+                    log.error("Minimum price must be <= maximum price")
+                    log.error(
+                        f"    {float(config[f'reserve_min_{x + 1}']):.2f} > {float(config[f'reserve_max_{x + 1}']):.2f}"
+                    )
+                    exit(0)
+                
+                self.asin_list.append(config[f"asin_list_{x + 1}"])
+                self.reserve_min.append(float(config[f"reserve_min_{x + 1}"]))
+                self.reserve_max.append(float(config[f"reserve_max_{x + 1}"]))
+        elif os.path.exists(AUTOBUY_CONFIG_PATH):
             with open(AUTOBUY_CONFIG_PATH) as json_file:
                 try:
                     config = json.load(json_file)

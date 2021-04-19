@@ -163,6 +163,12 @@ def main():
     help="Pass in encryption file password as argument",
 )
 @click.option(
+    "--config",
+    type=str,
+    default=None,
+    help="Pass in config file location as argument",
+)
+@click.option(
     "--log-stock-check",
     is_flag=True,
     default=False,
@@ -198,6 +204,12 @@ def main():
     default=False,
     help="Wait if captcha could not be solved. Only occurs if enters captcha handler during checkout.",
 )
+@click.option(
+    "--profile-suffix",
+    type=str,
+    default="",
+    help="Profile suffix.",
+)
 @notify_on_crash
 def amazon(
     no_image,
@@ -213,17 +225,20 @@ def amazon(
     disable_sound,
     slow_mode,
     p,
+	config,
     log_stock_check,
     shipping_bypass,
     clean_profile,
     clean_credentials,
     alt_offers,
     captcha_wait,
+    profile_suffix
 ):
     notification_handler.sound_enabled = not disable_sound
     if not notification_handler.sound_enabled:
         log.info("Local sounds have been disabled.")
 
+    global_config.suffix = profile_suffix
     if clean_profile and os.path.exists(global_config.get_browser_profile_path()):
         log.info(
             f"Removing existing profile at '{global_config.get_browser_profile_path()}'"
@@ -248,6 +263,7 @@ def amazon(
         slow_mode=slow_mode,
         no_image=no_image,
         encryption_pass=p,
+		config_path=config,
         log_stock_check=log_stock_check,
         shipping_bypass=shipping_bypass,
         alt_offers=alt_offers,
@@ -419,15 +435,15 @@ main.add_command(find_endpoints)
 main.add_command(show_traceroutes)
 
 # Global scope stuff here
-if is_latest():
-    log.info(f"FairGame v{version}")
-elif version.is_prerelease:
-    log.warning(f"FairGame PRE-RELEASE v{version}")
-else:
-    log.warning(
-        f"You are running FairGame v{version}, but the most recent version is v{get_latest_version()}. "
-        f"Consider upgrading "
-    )
+#if is_latest():
+#    log.info(f"FairGame v{version}")
+#elif version.is_prerelease:
+#    log.warning(f"FairGame PRE-RELEASE v{version}")
+#else:
+#    log.warning(
+#        f"You are running FairGame v{version}, but the most recent version is v{get_latest_version()}. "
+#        f"Consider upgrading "
+#    )
 
 global_config = GlobalConfig()
 notification_handler = NotificationHandler()
